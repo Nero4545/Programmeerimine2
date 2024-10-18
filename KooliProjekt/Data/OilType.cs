@@ -3,9 +3,16 @@
     public class OilType
     {
         public int Id { get; set; }
-        public string Name { get; set; } // Max length: 50
-        public string Description { get; set; } // Max length: 255
-        public List<SampleBatch> SampleBatches { get; set; } // A list of sample batches, optional
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        // Navigational property
+        public IList<OilBatch> OilBatches { get; set; }
+
+        public OilType()
+        {
+            OilBatches = new List<OilBatch>();
+        }
     }
 
 

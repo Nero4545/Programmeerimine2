@@ -9,5 +9,14 @@ namespace KooliProjekt.Data
             : base(options)
         {
         }
+
+        public DbSet<OilType> OilTypes { get; set; }
+        public DbSet<SampleBatch> SampleBatches { get; set; }
+        public DbSet<LogEntry> LogEntries { get; set; }
+        public DbSet<ManufacturingLog> ManufacturingLogs { get; set; }
+        public DbSet<BatchComposition> BatchCompositions { get; set; }
+        public DbSet<OilBatch> OilBatches { get; set; }
+        public DbSet<ProductComponent> ProductComponents { get; set; }
+
     }
 }

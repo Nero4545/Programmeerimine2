@@ -3,6 +3,7 @@
     public class OilBatch
     {
         public int Id { get; set; }
+        public int OilTypeId { get; set; }
         public OilType OilType { get; set; }
         public DateTime BatchDate { get; set; }
         public string Code { get; set; }

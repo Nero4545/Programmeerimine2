@@ -21,3 +21,37 @@
 <div>
     @(await Component.InvokeAsync<PagerViewComponent>(Model))
 </div>
+
+@model KooliProjekt.Models.OilTypesIndexModel
+
+<h1>Oil Types</h1>
+
+<form method="get">
+    <div>
+        <label for="Name">Name:</label>
+        <input type="text" id="Name" name="Name" value="@Model.SearchParameters.Name" />
+    </div>
+    <div>
+        <label for="Description">Description:</label>
+        <input type="text" id="Description" name="Description" value="@Model.SearchParameters.Description" />
+    </div>
+    <button type="submit">Search</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+            </tr>
+        }
+    </tbody>
+</table>

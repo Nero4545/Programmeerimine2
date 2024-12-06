@@ -3,13 +3,13 @@ using KooliProjekt.Search;
 
 namespace KooliProjekt.Services
 {
-    public interface IOilTypeService
+    public interface IOilBatchService
     {
-        Task<IEnumerable<OilType>> GetAll();
-        Task<OilType> GetById(int id);
-        Task Save(OilType oilType);
+        Task<IEnumerable<OilBatch>> GetAll();
+        Task<OilBatch> GetById(int id);
+        Task Save(OilBatch OilBatch);
         Task Delete(int id);
 
-        Task<List<OilType>> ListAsync(OilTypeSearchParameters searchParameters);
+        Task<List<OilBatch>> ListAsync(OilBatchSearchParameters searchParameters);
     }
 }

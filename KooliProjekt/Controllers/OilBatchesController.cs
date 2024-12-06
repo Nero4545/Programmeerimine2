@@ -7,9 +7,9 @@ namespace KooliProjekt.Controllers
 {
     public class OilBatchesController : Controller
     {
-        private readonly IOilBatchService _oilTypeService;
+        private readonly IOilBatchService _oilBatchService;
 
-        public OilBatchesController(IOilTypeService oilTypeService)
+        public OilBatchesController(IOilBatchService oilBatchService)
         {
             _oilBatchService = oilBatchService;
         }

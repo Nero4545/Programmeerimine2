@@ -8,4 +8,10 @@ namespace KooliProjekt.Models
         public OilTypeSearchParameters SearchParameters { get; set; }
         public List<OilType> Items { get; set; }
     }
+
+    public class OilBatchesIndexModel
+    {
+        public OilBatchSearchParameters SearchParameters { get; set; }
+        public List<OilBatch> Items { get; set; }
+    }
 }

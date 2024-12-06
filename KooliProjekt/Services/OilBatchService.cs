@@ -13,6 +13,21 @@ namespace KooliProjekt.Services
             _context = context;
         }
 
+        public Task Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<OilBatch>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<OilBatch> GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         // Метод для получения списка с учетом параметров поиска
         public async Task<List<OilBatch>> ListAsync(OilBatchSearchParameters searchParameters)
         {
@@ -29,6 +44,11 @@ namespace KooliProjekt.Services
             }
 
             return await query.ToListAsync();
+        }
+
+        public Task Save(OilBatch OilBatch)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -14,9 +14,9 @@ namespace KooliProjekt.Services
         }
 
         // Метод для получения списка с учетом параметров поиска
-        public async Task<List<OilBatch>> ListAsync(OilTypeSearchParameters searchParameters)
+        public async Task<List<OilBatch>> ListAsync(OilBatchSearchParameters searchParameters)
         {
-            var query = _context.OilTypes.AsQueryable();
+            var query = _context.OilBatches.AsQueryable();
 
             if (!string.IsNullOrEmpty(searchParameters.Name))
             {

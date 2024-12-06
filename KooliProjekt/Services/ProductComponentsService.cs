@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Services
 {
-    public class OilTypeService : IOilTypeService
+    public class ProductComponentService : IProductComponentService
     {
         private readonly ApplicationDbContext _context;
 
-        public OilTypeService(ApplicationDbContext context)
+        public ProductComponentService(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -18,20 +18,20 @@ namespace KooliProjekt.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<OilType>> GetAll()
+        public Task<IEnumerable<ProductComponent>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<OilType> GetById(int id)
+        public Task<ProductComponent> GetById(int id)
         {
             throw new NotImplementedException();
         }
 
         // Метод для получения списка с учетом параметров поиска
-        public async Task<List<OilType>> ListAsync(OilTypeSearchParameters searchParameters)
+        public async Task<List<ProductComponent>> ListAsync(ProductComponentSearchParameters searchParameters)
         {
-            var query = _context.OilTypes.AsQueryable();
+            var query = _context.ProductComponents.AsQueryable();
 
             if (!string.IsNullOrEmpty(searchParameters.Name))
             {
@@ -40,13 +40,13 @@ namespace KooliProjekt.Services
 
             if (!string.IsNullOrEmpty(searchParameters.Description))
             {
-                query = query.Where(o => o.Description.Contains(searchParameters.Description));
+                query = query.Where(o => o.Unit.Contains(searchParameters.Description));
             }
 
             return await query.ToListAsync();
         }
 
-        public Task Save(OilType oilType)
+        public Task Save(ProductComponent ProductComponent)
         {
             throw new NotImplementedException();
         }

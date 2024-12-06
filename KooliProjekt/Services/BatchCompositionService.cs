@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Services
 {
-    public class OilTypeService : IOilTypeService
+    public class BatchCompositionService : IBatchCompositionService
     {
         private readonly ApplicationDbContext _context;
 
-        public OilTypeService(ApplicationDbContext context)
+        public BatchCompositionService(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -18,35 +18,35 @@ namespace KooliProjekt.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<OilType>> GetAll()
+        public Task<IEnumerable<BatchComposition>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<OilType> GetById(int id)
+        public Task<BatchComposition> GetById(int id)
         {
             throw new NotImplementedException();
         }
 
         // Метод для получения списка с учетом параметров поиска
-        public async Task<List<OilType>> ListAsync(OilTypeSearchParameters searchParameters)
+        public async Task<List<BatchComposition>> ListAsync(BatchCompositionSearchParameters searchParameters)
         {
-            var query = _context.OilTypes.AsQueryable();
+            var query = _context.BatchCompositions.AsQueryable();
 
             if (!string.IsNullOrEmpty(searchParameters.Name))
             {
-                query = query.Where(o => o.Name.Contains(searchParameters.Name));
+                query = query.Where(o => o.OilBatch.Contains(searchParameters.Name));
             }
 
             if (!string.IsNullOrEmpty(searchParameters.Description))
             {
-                query = query.Where(o => o.Description.Contains(searchParameters.Description));
+                query = query.Where(o => o.OilBatchId.Contains(searchParameters.Description));
             }
 
             return await query.ToListAsync();
         }
 
-        public Task Save(OilType oilType)
+        public Task Save(BatchComposition BatchComposition)
         {
             throw new NotImplementedException();
         }

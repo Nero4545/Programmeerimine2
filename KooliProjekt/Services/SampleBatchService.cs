@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Services
 {
-    public class OilTypeService : IOilTypeService
+    public class SampleBatchService : ISampleBatchService
     {
         private readonly ApplicationDbContext _context;
 
-        public OilTypeService(ApplicationDbContext context)
+        public SampleBatchService(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -18,24 +18,24 @@ namespace KooliProjekt.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<OilType>> GetAll()
+        public Task<IEnumerable<SampleBatch>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<OilType> GetById(int id)
+        public Task<SampleBatch> GetById(int id)
         {
             throw new NotImplementedException();
         }
 
         // Метод для получения списка с учетом параметров поиска
-        public async Task<List<OilType>> ListAsync(OilTypeSearchParameters searchParameters)
+        public async Task<List<SampleBatch>> ListAsync(SampleBatchSearchParameters searchParameters)
         {
-            var query = _context.OilTypes.AsQueryable();
+            var query = _context.SampleBatches.AsQueryable();
 
             if (!string.IsNullOrEmpty(searchParameters.Name))
             {
-                query = query.Where(o => o.Name.Contains(searchParameters.Name));
+                query = query.Where(o => o.Id.Contains(searchParameters.Name));
             }
 
             if (!string.IsNullOrEmpty(searchParameters.Description))
@@ -46,7 +46,7 @@ namespace KooliProjekt.Services
             return await query.ToListAsync();
         }
 
-        public Task Save(OilType oilType)
+        public Task Save(SampleBatch SampleBatch)
         {
             throw new NotImplementedException();
         }

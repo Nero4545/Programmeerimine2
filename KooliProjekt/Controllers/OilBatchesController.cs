@@ -1,4 +1,5 @@
-﻿using KooliProjekt.Models;
+﻿using KooliProjekt.Data;
+using KooliProjekt.Models;
 using KooliProjekt.Search;
 using KooliProjekt.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -25,5 +26,11 @@ namespace KooliProjekt.Controllers
             };
             return View(model);
         }
+    }
+
+    internal class OilBatchesIndexModel
+    {
+        public OilBatchSearchParameters SearchParameters { get; set; }
+        public List<OilBatch> Items { get; set; }
     }
 }

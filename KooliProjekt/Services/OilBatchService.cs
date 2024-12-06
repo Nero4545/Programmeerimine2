@@ -20,7 +20,7 @@ namespace KooliProjekt.Services
 
             if (!string.IsNullOrEmpty(searchParameters.Name))
             {
-                query = query.Where(o => o.Name.Contains(searchParameters.Name));
+                query = query.Where(o => o.Code.Contains(searchParameters.Name));
             }
 
             if (!string.IsNullOrEmpty(searchParameters.Description))

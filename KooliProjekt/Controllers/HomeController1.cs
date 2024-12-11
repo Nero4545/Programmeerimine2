@@ -24,18 +24,17 @@ namespace KooliProjekt.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        // Инъекция контекста базы данных через конструктор
         public TodoListsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // Метод Index с поддержкой пагинации
+        
         public async Task<IActionResult> Index(int page = 1)
         {
-            // Получение данных с использованием метода расширения GetPaged
-            var data = await _context.TodoLists.GetPaged(page, 5); // 5 элементов на страницу
-            return View(data); // Передача данных в представление
+            
+            var data = await _context.TodoLists.GetPaged(page, 5); 
+            return View(data); 
         }
     }
 }

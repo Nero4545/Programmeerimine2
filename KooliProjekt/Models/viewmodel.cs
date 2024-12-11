@@ -14,4 +14,33 @@ namespace KooliProjekt.Models
         public OilBatchSearchParameters SearchParameters { get; set; }
         public List<OilBatch> Items { get; set; }
     }
+
+    public class ProductComponentsIndexModel
+    {
+        public ProductComponentSearchParameters SearchParameters { get; set; }
+        public List<OilBatch> Items { get; set; }
+
+        public static implicit operator ProductComponentsIndexModel(ProductComponentsIndexModel v)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SampleBatchIndexModel
+    {
+        public SampleBatchSearchParameters SearchParameters { get; set; }
+        public List<OilBatch> Items { get; set; }
+    }
+
+    public class ManufacturingLogIndexModel
+    {
+        public ManufacturingLogSearchParameters SearchParameters { get; set; }
+        public List<OilBatch> Items { get; set; }
+    }
+
+    public class BatchCompositionIndexModel
+    {
+        public BatchCompositionSearchParameters SearchParameters { get; set; }
+        public List<OilBatch> Items { get; set; }
+    }
 }

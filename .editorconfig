@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# IDE0023: Использовать текст блока для оператора преобразования
+csharp_style_expression_bodied_operators = true

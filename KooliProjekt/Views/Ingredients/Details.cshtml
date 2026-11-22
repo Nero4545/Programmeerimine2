@@ -1,0 +1,26 @@
+@model KooliProjekt.Data.Ingredient
+
+@{
+    ViewData["Title"] = "Ingredient details";
+}
+
+<h1>Ingredient details</h1>
+<hr />
+<dl class="dl-horizontal">
+        <dt>Batch</dt>
+        <dd>@Model.Batch?.Code</dd>
+        <dt>Name</dt>
+        <dd>@Model.Name</dd>
+        <dt>Unit</dt>
+        <dd>@Model.Unit</dd>
+        <dt>Unit price</dt>
+        <dd>@Model.UnitPrice.ToString("0.00")</dd>
+        <dt>Quantity</dt>
+        <dd>@Model.Quantity.ToString("0.###")</dd>
+        <dt>Total</dt>
+        <dd>@Model.Total.ToString("0.00")</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-default">Back to list</a>
+</div>

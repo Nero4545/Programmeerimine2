@@ -1,0 +1,89 @@
+@model KooliProjekt.Data.Batch
+
+@{
+    ViewData["Title"] = "Batch details";
+}
+
+<h1>Batch details</h1>
+<hr />
+<dl class="dl-horizontal">
+        <dt>Code</dt>
+        <dd>@Model.Code</dd>
+        <dt>Beer type</dt>
+        <dd>@Model.BeerType?.Name</dd>
+        <dt>Batch date</dt>
+        <dd>@Model.BatchDate.ToString("dd.MM.yyyy")</dd>
+        <dt>Description</dt>
+        <dd>@Model.Description</dd>
+        <dt>Summary</dt>
+        <dd>@Model.Summary</dd>
+</dl>
+<h3>Ingredients</h3>
+<p><a asp-controller="Ingredients" asp-action="Create" asp-route-batchId="@Model.Id">Add ingredient</a></p>
+<table class="table table-condensed">
+    <thead><tr><th>Name</th><th>Unit</th><th>Unit price</th><th>Quantity</th><th>Total</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model.Ingredients)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Unit</td>
+                <td>@item.UnitPrice.ToString("0.00")</td>
+                <td>@item.Quantity.ToString("0.###")</td>
+                <td>@item.Total.ToString("0.00")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<p><strong>Ingredients total: @Model.Ingredients.Sum(x => x.Total).ToString("0.00")</strong></p>
+
+<h3>Brewing log</h3>
+<p><a asp-controller="LogEntries" asp-action="Create" asp-route-batchId="@Model.Id">Add log entry</a></p>
+<table class="table table-condensed">
+    <thead><tr><th>Date</th><th>Description</th><th>User</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model.LogEntries.OrderBy(x => x.Date))
+        {
+            <tr>
+                <td>@item.Date.ToString("dd.MM.yyyy")</td>
+                <td>@item.Description</td>
+                <td>@item.User?.UserName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Tastings</h3>
+<p><a asp-controller="TastingEntries" asp-action="Create" asp-route-batchId="@Model.Id">Add tasting</a></p>
+<table class="table table-condensed">
+    <thead><tr><th>Date</th><th>User</th><th>Rating</th><th>Comment</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model.TastingEntries.OrderBy(x => x.Date))
+        {
+            <tr>
+                <td>@item.Date.ToString("dd.MM.yyyy")</td>
+                <td>@item.User?.UserName</td>
+                <td>@item.Rating</td>
+                <td>@item.Comment</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Photos</h3>
+<p><a asp-controller="BatchPhotos" asp-action="Create" asp-route-batchId="@Model.Id">Add photo</a></p>
+<div class="row">
+    @foreach (var photo in Model.Photos)
+    {
+        <div class="col-md-3">
+            <a href="@photo.Url" target="_blank" class="thumbnail">
+                <img src="@photo.Url" alt="@photo.Description" />
+            </a>
+            <p>@photo.Description</p>
+        </div>
+    }
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-default">Back to list</a>
+</div>

@@ -1,7 +1,13 @@
 ﻿<!-- BEGIN SIDEBAR -->
 <div class="sidebar col-md-3 col-sm-5">
     <ul class="list-group margin-bottom-25 sidebar-menu">
-        <li class="list-group-item clearfix"><a href="../"><i class="fa fa-angle-right"></i> Home</a></li>
+        <li class="list-group-item clearfix"><a asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right"></i> Home</a></li>
+        <li class="list-group-item clearfix"><a asp-controller="BeerTypes" asp-action="Index"><i class="fa fa-angle-right"></i> Beer types</a></li>
+        <li class="list-group-item clearfix"><a asp-controller="Batches" asp-action="Index"><i class="fa fa-angle-right"></i> Batches</a></li>
+        <li class="list-group-item clearfix"><a asp-controller="Ingredients" asp-action="Index"><i class="fa fa-angle-right"></i> Ingredients</a></li>
+        <li class="list-group-item clearfix"><a asp-controller="LogEntries" asp-action="Index"><i class="fa fa-angle-right"></i> Brewing log</a></li>
+        <li class="list-group-item clearfix"><a asp-controller="TastingEntries" asp-action="Index"><i class="fa fa-angle-right"></i> Tasting log</a></li>
+        <li class="list-group-item clearfix"><a asp-controller="BatchPhotos" asp-action="Index"><i class="fa fa-angle-right"></i> Batch photos</a></li>
         @*<li class="list-group-item clearfix dropdown active">
         <a href="../" class="collapsed">
             <i class="fa fa-angle-right"></i>
@@ -36,4 +42,4 @@
         </li>*@
     </ul>
 </div>
-<!-- END SIDEBAR -->
+<!-- END SIDEBAR -->

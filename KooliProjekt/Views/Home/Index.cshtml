@@ -1,91 +1,22 @@
-﻿@model PagedResult<TodoList>
+@{
+    ViewData["Title"] = "Home";
+}
 
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Results)
-        {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.Name</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<h1>Pruulikoda</h1>
+<p>Proovipruulide saamisloo jäädvustamine: õllesordid, proovipartiid, koostisosad, pruulimise logi, maitsmised ja fotod.</p>
 
-<div>
-    @(await Component.InvokeAsync<PagerViewComponent>(Model))
-</div>
-
-@model KooliProjekt.Models.OilTypesIndexModel
-
-<h1>Oil Types</h1>
-
-<form method="get">
-    <div>
-        <label for="Name">Name:</label>
-        <input type="text" id="Name" name="Name" value="@Model.SearchParameters.Name" />
-    </div>
-    <div>
-        <label for="Description">Description:</label>
-        <input type="text" id="Description" name="Description" value="@Model.SearchParameters.Description" />
-    </div>
-    <button type="submit">Search</button>
-</form>
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
-        {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.Description</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-@model KooliProjekt.Models.OilBatchesIndexModel
-
-<h1>Oil Batches</h1>
-
-<form method="get">
-    <div>
-        <label for="Name">Name:</label>
-        <input type="text" id="Name" name="Name" value="@Model.SearchParameters.Name" />
-    </div>
-    <div>
-        <label for="Description">Description:</label>
-        <input type="text" id="Description" name="Description" value="@Model.SearchParameters.Description" />
-    </div>
-    <button type="submit">Search</button>
-</form>
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
-        {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.Description</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <ul class="list-unstyled">
+        <li><a asp-controller="BeerTypes" asp-action="Index">Beer types</a></li>
+        <li><a asp-controller="Batches" asp-action="Index">Batches</a></li>
+        <li><a asp-controller="Ingredients" asp-action="Index">Ingredients</a></li>
+        <li><a asp-controller="LogEntries" asp-action="Index">Brewing log</a></li>
+        <li><a asp-controller="TastingEntries" asp-action="Index">Tasting log</a></li>
+        <li><a asp-controller="BatchPhotos" asp-action="Index">Batch photos</a></li>
+    </ul>
+}
+else
+{
+    <p>Süsteemi kasutamiseks <a asp-area="Identity" asp-page="/Account/Login">logi sisse</a>.</p>
+}

@@ -1,0 +1,39 @@
+@model PagedResult<KooliProjekt.Data.BatchPhoto>
+
+@{
+    ViewData["Title"] = "Batch photos";
+}
+
+<h1>Batch photos</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add new</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+                <th>Batch</th>
+                <th>Photo</th>
+                <th>Description</th>
+                <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Results)
+        {
+            <tr>
+                    <td>@item.Batch?.Code</td>
+                    <td><a href="@item.Url" target="_blank"><img src="@item.Url" alt="@item.Description" style="max-height:60px" /></a></td>
+                    <td>@item.Description</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@(await Component.InvokeAsync<PagerViewComponent>(Model))

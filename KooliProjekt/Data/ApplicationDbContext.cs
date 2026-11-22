@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Data
@@ -10,13 +10,27 @@ namespace KooliProjekt.Data
         {
         }
 
-        public DbSet<OilType> OilTypes { get; set; }
-        public DbSet<SampleBatch> SampleBatches { get; set; }
+        public DbSet<BeerType> BeerTypes { get; set; }
+        public DbSet<Batch> Batches { get; set; }
+        public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<LogEntry> LogEntries { get; set; }
-        public DbSet<ManufacturingLog> ManufacturingLogs { get; set; }
-        public DbSet<BatchComposition> BatchCompositions { get; set; }
-        public DbSet<OilBatch> OilBatches { get; set; }
-        public DbSet<ProductComponent> ProductComponents { get; set; }
+        public DbSet<TastingEntry> TastingEntries { get; set; }
+        public DbSet<BatchPhoto> BatchPhotos { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            // Kasutaja kustutamisel kanded jäävad alles (kasutaja väli tühjendatakse)
+            builder.Entity<LogEntry>()
+                .HasOne(e => e.User).WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<TastingEntry>()
+                .HasOne(e => e.User).WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+        }
     }
 }

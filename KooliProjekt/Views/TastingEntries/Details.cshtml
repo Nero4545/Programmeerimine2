@@ -1,0 +1,24 @@
+@model KooliProjekt.Data.TastingEntry
+
+@{
+    ViewData["Title"] = "Tasting entry details";
+}
+
+<h1>Tasting entry details</h1>
+<hr />
+<dl class="dl-horizontal">
+        <dt>Date</dt>
+        <dd>@Model.Date.ToString("dd.MM.yyyy")</dd>
+        <dt>Batch</dt>
+        <dd>@Model.Batch?.Code</dd>
+        <dt>User</dt>
+        <dd>@Model.User?.UserName</dd>
+        <dt>Rating</dt>
+        <dd>@Model.Rating</dd>
+        <dt>Comment</dt>
+        <dd>@Model.Comment</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-default">Back to list</a>
+</div>

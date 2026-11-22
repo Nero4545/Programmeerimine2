@@ -13,9 +13,13 @@
                 <li>
                     <a asp-controller="Home" asp-action="Index">Home</a>
                 </li>
-                <li>
-                    <a asp-controller="Home" asp-action="Privacy">Privacy</a>
-                </li>
+                <li><a asp-controller="BeerTypes" asp-action="Index">Beer types</a></li>
+                <li><a asp-controller="Batches" asp-action="Index">Batches</a></li>
+                <li><a asp-controller="Ingredients" asp-action="Index">Ingredients</a></li>
+                <li><a asp-controller="LogEntries" asp-action="Index">Log</a></li>
+                <li><a asp-controller="TastingEntries" asp-action="Index">Tastings</a></li>
+                <li><a asp-controller="BatchPhotos" asp-action="Index">Photos</a></li>
+                <partial name="_LoginPartial" />
 
                 <!-- BEGIN TOP SEARCH -->
                 <li class="menu-search">
@@ -38,4 +42,4 @@
         <!-- END NAVIGATION -->
     </div>
 </div>
-<!-- Header END -->
+<!-- Header END -->

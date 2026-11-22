@@ -1,0 +1,20 @@
+@model KooliProjekt.Data.BatchPhoto
+
+@{
+    ViewData["Title"] = "Photo details";
+}
+
+<h1>Photo details</h1>
+<hr />
+<dl class="dl-horizontal">
+        <dt>Batch</dt>
+        <dd>@Model.Batch?.Code</dd>
+        <dt>Photo</dt>
+        <dd><img src="@Model.Url" alt="@Model.Description" style="max-width:100%" /></dd>
+        <dt>Description</dt>
+        <dd>@Model.Description</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-default">Back to list</a>
+</div>

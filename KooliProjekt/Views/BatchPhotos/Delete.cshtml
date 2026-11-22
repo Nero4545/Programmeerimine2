@@ -1,0 +1,24 @@
+@model KooliProjekt.Data.BatchPhoto
+
+@{
+    ViewData["Title"] = "Delete photo";
+}
+
+<h1>Delete photo</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<hr />
+<dl class="dl-horizontal">
+        <dt>Batch</dt>
+        <dd>@Model.Batch?.Code</dd>
+        <dt>Photo</dt>
+        <dd><img src="@Model.Url" alt="@Model.Description" style="max-width:100%" /></dd>
+        <dt>Description</dt>
+        <dd>@Model.Description</dd>
+</dl>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <input type="submit" value="Delete" class="btn btn-danger" />
+    <a asp-action="Index" class="btn btn-default">Back to list</a>
+</form>

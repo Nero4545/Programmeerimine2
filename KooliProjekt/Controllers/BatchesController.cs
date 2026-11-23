@@ -1,30 +1,32 @@
 using KooliProjekt.Data;
+using KooliProjekt.Models;
+using KooliProjekt.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Controllers
 {
     [Authorize]
     public class BatchesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBatchService _batchService;
+        private readonly IBeerTypeService _beerTypeService;
 
-        public BatchesController(ApplicationDbContext context)
+        public BatchesController(IBatchService batchService, IBeerTypeService beerTypeService)
         {
-            _context = context;
+            _batchService = batchService;
+            _beerTypeService = beerTypeService;
         }
 
         // GET: Batches
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, BatchesIndexModel? model = null)
         {
-            var data = await _context.Batches
-                .Include(b => b.BeerType)
-                .OrderByDescending(b => b.BatchDate)
-                .GetPagedAsync(page, 5);
+            model = model ?? new BatchesIndexModel();
+            model.Data = await _batchService.List(page, 5, model.Search);
+            await FillLookups(null);
 
-            return View(data);
+            return View(model);
         }
 
         // GET: Batches/Details/5
@@ -35,13 +37,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var batch = await _context.Batches
-                .Include(b => b.BeerType)
-                .Include(b => b.Ingredients)
-                .Include(b => b.LogEntries).ThenInclude(l => l.User)
-                .Include(b => b.TastingEntries).ThenInclude(t => t.User)
-                .Include(b => b.Photos)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var batch = await _batchService.Get(id.Value);
             if (batch == null)
             {
                 return NotFound();
@@ -51,10 +47,11 @@ namespace KooliProjekt.Controllers
         }
 
         // GET: Batches/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            FillBeerTypes(null);
-            return View(new Batch { BatchDate = DateTime.Today });
+            var batch = new Batch { BatchDate = DateTime.Today };
+            await FillLookups(null);
+            return View(batch);
         }
 
         // POST: Batches/Create
@@ -64,11 +61,11 @@ namespace KooliProjekt.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(batch);
-                await _context.SaveChangesAsync();
+                await _batchService.Save(batch);
                 return RedirectToAction(nameof(Index));
             }
-            FillBeerTypes(batch.BeerTypeId);
+
+            await FillLookups(batch.BeerTypeId);
             return View(batch);
         }
 
@@ -80,12 +77,13 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var batch = await _context.Batches.FindAsync(id);
+            var batch = await _batchService.Get(id.Value);
             if (batch == null)
             {
                 return NotFound();
             }
-            FillBeerTypes(batch.BeerTypeId);
+
+            await FillLookups(batch.BeerTypeId);
             return View(batch);
         }
 
@@ -101,11 +99,11 @@ namespace KooliProjekt.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Update(batch);
-                await _context.SaveChangesAsync();
+                await _batchService.Save(batch);
                 return RedirectToAction(nameof(Index));
             }
-            FillBeerTypes(batch.BeerTypeId);
+
+            await FillLookups(batch.BeerTypeId);
             return View(batch);
         }
 
@@ -117,9 +115,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var batch = await _context.Batches
-                .Include(b => b.BeerType)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var batch = await _batchService.Get(id.Value);
             if (batch == null)
             {
                 return NotFound();
@@ -133,19 +129,13 @@ namespace KooliProjekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var batch = await _context.Batches.FindAsync(id);
-            if (batch != null)
-            {
-                _context.Batches.Remove(batch);
-                await _context.SaveChangesAsync();
-            }
-
+            await _batchService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private void FillBeerTypes(int? selectedId)
+        private async Task FillLookups(int? selectedId)
         {
-            ViewData["BeerTypeId"] = new SelectList(_context.BeerTypes.OrderBy(x => x.Name), "Id", "Name", selectedId);
+            ViewData["BeerTypeId"] = new SelectList(await _beerTypeService.Lookup(), "Id", "Name", selectedId);
         }
     }
 }

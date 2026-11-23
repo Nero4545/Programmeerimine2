@@ -1,31 +1,33 @@
 using System.Security.Claims;
 using KooliProjekt.Data;
+using KooliProjekt.Models;
+using KooliProjekt.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Controllers
 {
     [Authorize]
     public class LogEntriesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ILogEntryService _logEntryService;
+        private readonly IBatchService _batchService;
 
-        public LogEntriesController(ApplicationDbContext context)
+        public LogEntriesController(ILogEntryService logEntryService, IBatchService batchService)
         {
-            _context = context;
+            _logEntryService = logEntryService;
+            _batchService = batchService;
         }
 
         // GET: LogEntries
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, LogEntriesIndexModel? model = null)
         {
-            var data = await _context.LogEntries
-                .Include(x => x.Batch).Include(x => x.User)
-                .OrderByDescending(x => x.Date)
-                .GetPagedAsync(page, 5);
+            model = model ?? new LogEntriesIndexModel();
+            model.Data = await _logEntryService.List(page, 5, model.Search);
+            await FillLookups(null);
 
-            return View(data);
+            return View(model);
         }
 
         // GET: LogEntries/Details/5
@@ -36,9 +38,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var logEntry = await _context.LogEntries
-                .Include(x => x.Batch).Include(x => x.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var logEntry = await _logEntryService.Get(id.Value);
             if (logEntry == null)
             {
                 return NotFound();
@@ -48,7 +48,7 @@ namespace KooliProjekt.Controllers
         }
 
         // GET: LogEntries/Create
-        public IActionResult Create(int? batchId)
+        public async Task<IActionResult> Create(int? batchId)
         {
             var logEntry = new LogEntry { Date = DateTime.Today };
             if (batchId.HasValue)
@@ -56,7 +56,7 @@ namespace KooliProjekt.Controllers
                 logEntry.BatchId = batchId.Value;
             }
 
-            FillBatches(logEntry.BatchId);
+            await FillLookups(logEntry.BatchId);
             return View(logEntry);
         }
 
@@ -66,13 +66,14 @@ namespace KooliProjekt.Controllers
         public async Task<IActionResult> Create([Bind("Id,BatchId,Date,Description,UserId")] LogEntry logEntry)
         {
             logEntry.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             if (ModelState.IsValid)
             {
-                _context.Add(logEntry);
-                await _context.SaveChangesAsync();
+                await _logEntryService.Save(logEntry);
                 return RedirectToAction(nameof(Index));
             }
-            FillBatches(logEntry.BatchId);
+
+            await FillLookups(logEntry.BatchId);
             return View(logEntry);
         }
 
@@ -84,12 +85,13 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var logEntry = await _context.LogEntries.FindAsync(id);
+            var logEntry = await _logEntryService.Get(id.Value);
             if (logEntry == null)
             {
                 return NotFound();
             }
-            FillBatches(logEntry.BatchId);
+
+            await FillLookups(logEntry.BatchId);
             return View(logEntry);
         }
 
@@ -105,11 +107,11 @@ namespace KooliProjekt.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Update(logEntry);
-                await _context.SaveChangesAsync();
+                await _logEntryService.Save(logEntry);
                 return RedirectToAction(nameof(Index));
             }
-            FillBatches(logEntry.BatchId);
+
+            await FillLookups(logEntry.BatchId);
             return View(logEntry);
         }
 
@@ -121,9 +123,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var logEntry = await _context.LogEntries
-                .Include(x => x.Batch).Include(x => x.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var logEntry = await _logEntryService.Get(id.Value);
             if (logEntry == null)
             {
                 return NotFound();
@@ -137,19 +137,13 @@ namespace KooliProjekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var logEntry = await _context.LogEntries.FindAsync(id);
-            if (logEntry != null)
-            {
-                _context.LogEntries.Remove(logEntry);
-                await _context.SaveChangesAsync();
-            }
-
+            await _logEntryService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private void FillBatches(int? selectedId)
+        private async Task FillLookups(int? selectedId)
         {
-            ViewData["BatchId"] = new SelectList(_context.Batches.OrderBy(x => x.Code), "Id", "Code", selectedId);
+            ViewData["BatchId"] = new SelectList(await _batchService.Lookup(), "Id", "Code", selectedId);
         }
     }
 }

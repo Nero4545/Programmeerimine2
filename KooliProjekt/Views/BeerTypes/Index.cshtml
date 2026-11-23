@@ -1,4 +1,4 @@
-@model PagedResult<KooliProjekt.Data.BeerType>
+@model KooliProjekt.Models.BeerTypesIndexModel
 
 @{
     ViewData["Title"] = "Beer types";
@@ -10,6 +10,15 @@
     <a asp-action="Create" class="btn btn-primary">Add new</a>
 </p>
 
+<form method="get" class="form-inline" style="margin-bottom:20px">
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.Keyword" class="control-label">Name or description</label>
+            <input asp-for="Search.Keyword" class="form-control" placeholder="Name or description" />
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Index" class="btn btn-default">Clear</a>
+</form>
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -19,7 +28,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Results)
+        @foreach (var item in Model.Data.Results)
         {
             <tr>
                     <td>@item.Name</td>
@@ -34,4 +43,4 @@
     </tbody>
 </table>
 
-@(await Component.InvokeAsync<PagerViewComponent>(Model))
+@(await Component.InvokeAsync<PagerViewComponent>(Model.Data))

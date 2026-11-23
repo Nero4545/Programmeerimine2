@@ -1,4 +1,4 @@
-@model PagedResult<KooliProjekt.Data.Ingredient>
+@model KooliProjekt.Models.IngredientsIndexModel
 
 @{
     ViewData["Title"] = "Ingredients";
@@ -9,6 +9,21 @@
 <p>
     <a asp-action="Create" class="btn btn-primary">Add new</a>
 </p>
+
+<form method="get" class="form-inline" style="margin-bottom:20px">
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.Keyword" class="control-label">Ingredient name</label>
+            <input asp-for="Search.Keyword" class="form-control" placeholder="Ingredient name" />
+        </div>
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.BatchId" class="control-label">Batch</label>
+            <select asp-for="Search.BatchId" asp-items="ViewBag.BatchId" class="form-control">
+                <option value="">-- all --</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Index" class="btn btn-default">Clear</a>
+</form>
 
 <table class="table table-striped">
     <thead>
@@ -23,7 +38,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Results)
+        @foreach (var item in Model.Data.Results)
         {
             <tr>
                     <td>@item.Batch?.Code</td>
@@ -42,4 +57,4 @@
     </tbody>
 </table>
 
-@(await Component.InvokeAsync<PagerViewComponent>(Model))
+@(await Component.InvokeAsync<PagerViewComponent>(Model.Data))

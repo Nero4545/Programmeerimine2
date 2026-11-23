@@ -1,30 +1,32 @@
 using KooliProjekt.Data;
+using KooliProjekt.Models;
+using KooliProjekt.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Controllers
 {
     [Authorize]
     public class BatchPhotosController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBatchPhotoService _batchPhotoService;
+        private readonly IBatchService _batchService;
 
-        public BatchPhotosController(ApplicationDbContext context)
+        public BatchPhotosController(IBatchPhotoService batchPhotoService, IBatchService batchService)
         {
-            _context = context;
+            _batchPhotoService = batchPhotoService;
+            _batchService = batchService;
         }
 
         // GET: BatchPhotos
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, BatchPhotosIndexModel? model = null)
         {
-            var data = await _context.BatchPhotos
-                .Include(x => x.Batch)
-                .OrderBy(x => x.Batch!.Code)
-                .GetPagedAsync(page, 5);
+            model = model ?? new BatchPhotosIndexModel();
+            model.Data = await _batchPhotoService.List(page, 5, model.Search);
+            await FillLookups(null);
 
-            return View(data);
+            return View(model);
         }
 
         // GET: BatchPhotos/Details/5
@@ -35,9 +37,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var batchPhoto = await _context.BatchPhotos
-                .Include(x => x.Batch)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var batchPhoto = await _batchPhotoService.Get(id.Value);
             if (batchPhoto == null)
             {
                 return NotFound();
@@ -47,7 +47,7 @@ namespace KooliProjekt.Controllers
         }
 
         // GET: BatchPhotos/Create
-        public IActionResult Create(int? batchId)
+        public async Task<IActionResult> Create(int? batchId)
         {
             var batchPhoto = new BatchPhoto();
             if (batchId.HasValue)
@@ -55,7 +55,7 @@ namespace KooliProjekt.Controllers
                 batchPhoto.BatchId = batchId.Value;
             }
 
-            FillBatches(batchPhoto.BatchId);
+            await FillLookups(batchPhoto.BatchId);
             return View(batchPhoto);
         }
 
@@ -66,11 +66,11 @@ namespace KooliProjekt.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(batchPhoto);
-                await _context.SaveChangesAsync();
+                await _batchPhotoService.Save(batchPhoto);
                 return RedirectToAction(nameof(Index));
             }
-            FillBatches(batchPhoto.BatchId);
+
+            await FillLookups(batchPhoto.BatchId);
             return View(batchPhoto);
         }
 
@@ -82,12 +82,13 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var batchPhoto = await _context.BatchPhotos.FindAsync(id);
+            var batchPhoto = await _batchPhotoService.Get(id.Value);
             if (batchPhoto == null)
             {
                 return NotFound();
             }
-            FillBatches(batchPhoto.BatchId);
+
+            await FillLookups(batchPhoto.BatchId);
             return View(batchPhoto);
         }
 
@@ -103,11 +104,11 @@ namespace KooliProjekt.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Update(batchPhoto);
-                await _context.SaveChangesAsync();
+                await _batchPhotoService.Save(batchPhoto);
                 return RedirectToAction(nameof(Index));
             }
-            FillBatches(batchPhoto.BatchId);
+
+            await FillLookups(batchPhoto.BatchId);
             return View(batchPhoto);
         }
 
@@ -119,9 +120,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var batchPhoto = await _context.BatchPhotos
-                .Include(x => x.Batch)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var batchPhoto = await _batchPhotoService.Get(id.Value);
             if (batchPhoto == null)
             {
                 return NotFound();
@@ -135,19 +134,13 @@ namespace KooliProjekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var batchPhoto = await _context.BatchPhotos.FindAsync(id);
-            if (batchPhoto != null)
-            {
-                _context.BatchPhotos.Remove(batchPhoto);
-                await _context.SaveChangesAsync();
-            }
-
+            await _batchPhotoService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private void FillBatches(int? selectedId)
+        private async Task FillLookups(int? selectedId)
         {
-            ViewData["BatchId"] = new SelectList(_context.Batches.OrderBy(x => x.Code), "Id", "Code", selectedId);
+            ViewData["BatchId"] = new SelectList(await _batchService.Lookup(), "Id", "Code", selectedId);
         }
     }
 }

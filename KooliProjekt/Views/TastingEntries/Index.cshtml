@@ -1,4 +1,4 @@
-@model PagedResult<KooliProjekt.Data.TastingEntry>
+@model KooliProjekt.Models.TastingEntriesIndexModel
 
 @{
     ViewData["Title"] = "Tasting log";
@@ -9,6 +9,25 @@
 <p>
     <a asp-action="Create" class="btn btn-primary">Add new</a>
 </p>
+
+<form method="get" class="form-inline" style="margin-bottom:20px">
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.Keyword" class="control-label">Comment</label>
+            <input asp-for="Search.Keyword" class="form-control" placeholder="Comment" />
+        </div>
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.BatchId" class="control-label">Batch</label>
+            <select asp-for="Search.BatchId" asp-items="ViewBag.BatchId" class="form-control">
+                <option value="">-- all --</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.MinRating" class="control-label">Min rating</label>
+            <input asp-for="Search.MinRating" type="number" min="1" max="10" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Index" class="btn btn-default">Clear</a>
+</form>
 
 <table class="table table-striped">
     <thead>
@@ -22,7 +41,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Results)
+        @foreach (var item in Model.Data.Results)
         {
             <tr>
                     <td>@item.Date.ToString("dd.MM.yyyy")</td>
@@ -40,4 +59,4 @@
     </tbody>
 </table>
 
-@(await Component.InvokeAsync<PagerViewComponent>(Model))
+@(await Component.InvokeAsync<PagerViewComponent>(Model.Data))

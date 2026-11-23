@@ -1,4 +1,4 @@
-@model PagedResult<KooliProjekt.Data.LogEntry>
+@model KooliProjekt.Models.LogEntriesIndexModel
 
 @{
     ViewData["Title"] = "Brewing log";
@@ -9,6 +9,29 @@
 <p>
     <a asp-action="Create" class="btn btn-primary">Add new</a>
 </p>
+
+<form method="get" class="form-inline" style="margin-bottom:20px">
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.Keyword" class="control-label">Description</label>
+            <input asp-for="Search.Keyword" class="form-control" placeholder="Description" />
+        </div>
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.BatchId" class="control-label">Batch</label>
+            <select asp-for="Search.BatchId" asp-items="ViewBag.BatchId" class="form-control">
+                <option value="">-- all --</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.DateFrom" class="control-label">Date from</label>
+            <input asp-for="Search.DateFrom" type="date" class="form-control" />
+        </div>
+        <div class="form-group" style="margin-right:10px">
+            <label asp-for="Search.DateTo" class="control-label">Date to</label>
+            <input asp-for="Search.DateTo" type="date" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Index" class="btn btn-default">Clear</a>
+</form>
 
 <table class="table table-striped">
     <thead>
@@ -21,7 +44,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Results)
+        @foreach (var item in Model.Data.Results)
         {
             <tr>
                     <td>@item.Date.ToString("dd.MM.yyyy")</td>
@@ -38,4 +61,4 @@
     </tbody>
 </table>
 
-@(await Component.InvokeAsync<PagerViewComponent>(Model))
+@(await Component.InvokeAsync<PagerViewComponent>(Model.Data))

@@ -1,30 +1,32 @@
 using KooliProjekt.Data;
+using KooliProjekt.Models;
+using KooliProjekt.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Controllers
 {
     [Authorize]
     public class IngredientsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IIngredientService _ingredientService;
+        private readonly IBatchService _batchService;
 
-        public IngredientsController(ApplicationDbContext context)
+        public IngredientsController(IIngredientService ingredientService, IBatchService batchService)
         {
-            _context = context;
+            _ingredientService = ingredientService;
+            _batchService = batchService;
         }
 
         // GET: Ingredients
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, IngredientsIndexModel? model = null)
         {
-            var data = await _context.Ingredients
-                .Include(x => x.Batch)
-                .OrderBy(x => x.Batch!.Code).ThenBy(x => x.Name)
-                .GetPagedAsync(page, 5);
+            model = model ?? new IngredientsIndexModel();
+            model.Data = await _ingredientService.List(page, 5, model.Search);
+            await FillLookups(null);
 
-            return View(data);
+            return View(model);
         }
 
         // GET: Ingredients/Details/5
@@ -35,9 +37,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var ingredient = await _context.Ingredients
-                .Include(x => x.Batch)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var ingredient = await _ingredientService.Get(id.Value);
             if (ingredient == null)
             {
                 return NotFound();
@@ -47,7 +47,7 @@ namespace KooliProjekt.Controllers
         }
 
         // GET: Ingredients/Create
-        public IActionResult Create(int? batchId)
+        public async Task<IActionResult> Create(int? batchId)
         {
             var ingredient = new Ingredient();
             if (batchId.HasValue)
@@ -55,7 +55,7 @@ namespace KooliProjekt.Controllers
                 ingredient.BatchId = batchId.Value;
             }
 
-            FillBatches(ingredient.BatchId);
+            await FillLookups(ingredient.BatchId);
             return View(ingredient);
         }
 
@@ -66,12 +66,11 @@ namespace KooliProjekt.Controllers
         {
             if (ModelState.IsValid)
             {
-            ingredient.Total = Math.Round(ingredient.UnitPrice * ingredient.Quantity, 2);
-                _context.Add(ingredient);
-                await _context.SaveChangesAsync();
+                await _ingredientService.Save(ingredient);
                 return RedirectToAction(nameof(Index));
             }
-            FillBatches(ingredient.BatchId);
+
+            await FillLookups(ingredient.BatchId);
             return View(ingredient);
         }
 
@@ -83,12 +82,13 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var ingredient = await _context.Ingredients.FindAsync(id);
+            var ingredient = await _ingredientService.Get(id.Value);
             if (ingredient == null)
             {
                 return NotFound();
             }
-            FillBatches(ingredient.BatchId);
+
+            await FillLookups(ingredient.BatchId);
             return View(ingredient);
         }
 
@@ -104,12 +104,11 @@ namespace KooliProjekt.Controllers
 
             if (ModelState.IsValid)
             {
-            ingredient.Total = Math.Round(ingredient.UnitPrice * ingredient.Quantity, 2);
-                _context.Update(ingredient);
-                await _context.SaveChangesAsync();
+                await _ingredientService.Save(ingredient);
                 return RedirectToAction(nameof(Index));
             }
-            FillBatches(ingredient.BatchId);
+
+            await FillLookups(ingredient.BatchId);
             return View(ingredient);
         }
 
@@ -121,9 +120,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var ingredient = await _context.Ingredients
-                .Include(x => x.Batch)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var ingredient = await _ingredientService.Get(id.Value);
             if (ingredient == null)
             {
                 return NotFound();
@@ -137,19 +134,13 @@ namespace KooliProjekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var ingredient = await _context.Ingredients.FindAsync(id);
-            if (ingredient != null)
-            {
-                _context.Ingredients.Remove(ingredient);
-                await _context.SaveChangesAsync();
-            }
-
+            await _ingredientService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private void FillBatches(int? selectedId)
+        private async Task FillLookups(int? selectedId)
         {
-            ViewData["BatchId"] = new SelectList(_context.Batches.OrderBy(x => x.Code), "Id", "Code", selectedId);
+            ViewData["BatchId"] = new SelectList(await _batchService.Lookup(), "Id", "Code", selectedId);
         }
     }
 }

@@ -1,28 +1,28 @@
 using KooliProjekt.Data;
+using KooliProjekt.Models;
+using KooliProjekt.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Controllers
 {
     [Authorize]
     public class BeerTypesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBeerTypeService _beerTypeService;
 
-        public BeerTypesController(ApplicationDbContext context)
+        public BeerTypesController(IBeerTypeService beerTypeService)
         {
-            _context = context;
+            _beerTypeService = beerTypeService;
         }
 
         // GET: BeerTypes
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, BeerTypesIndexModel? model = null)
         {
-            var data = await _context.BeerTypes
-                .OrderBy(x => x.Name)
-                .GetPagedAsync(page, 5);
+            model = model ?? new BeerTypesIndexModel();
+            model.Data = await _beerTypeService.List(page, 5, model.Search);
 
-            return View(data);
+            return View(model);
         }
 
         // GET: BeerTypes/Details/5
@@ -33,9 +33,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var beerType = await _context.BeerTypes
-                .Include(x => x.Batches)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var beerType = await _beerTypeService.Get(id.Value);
             if (beerType == null)
             {
                 return NotFound();
@@ -47,7 +45,7 @@ namespace KooliProjekt.Controllers
         // GET: BeerTypes/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new BeerType());
         }
 
         // POST: BeerTypes/Create
@@ -57,10 +55,10 @@ namespace KooliProjekt.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(beerType);
-                await _context.SaveChangesAsync();
+                await _beerTypeService.Save(beerType);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(beerType);
         }
 
@@ -72,11 +70,12 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var beerType = await _context.BeerTypes.FindAsync(id);
+            var beerType = await _beerTypeService.Get(id.Value);
             if (beerType == null)
             {
                 return NotFound();
             }
+
             return View(beerType);
         }
 
@@ -92,10 +91,10 @@ namespace KooliProjekt.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Update(beerType);
-                await _context.SaveChangesAsync();
+                await _beerTypeService.Save(beerType);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(beerType);
         }
 
@@ -107,8 +106,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var beerType = await _context.BeerTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var beerType = await _beerTypeService.Get(id.Value);
             if (beerType == null)
             {
                 return NotFound();
@@ -122,13 +120,7 @@ namespace KooliProjekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var beerType = await _context.BeerTypes.FindAsync(id);
-            if (beerType != null)
-            {
-                _context.BeerTypes.Remove(beerType);
-                await _context.SaveChangesAsync();
-            }
-
+            await _beerTypeService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
     }

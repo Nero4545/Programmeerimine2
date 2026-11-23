@@ -1,31 +1,33 @@
 using System.Security.Claims;
 using KooliProjekt.Data;
+using KooliProjekt.Models;
+using KooliProjekt.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Controllers
 {
     [Authorize]
     public class TastingEntriesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITastingEntryService _tastingEntryService;
+        private readonly IBatchService _batchService;
 
-        public TastingEntriesController(ApplicationDbContext context)
+        public TastingEntriesController(ITastingEntryService tastingEntryService, IBatchService batchService)
         {
-            _context = context;
+            _tastingEntryService = tastingEntryService;
+            _batchService = batchService;
         }
 
         // GET: TastingEntries
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, TastingEntriesIndexModel? model = null)
         {
-            var data = await _context.TastingEntries
-                .Include(x => x.Batch).Include(x => x.User)
-                .OrderByDescending(x => x.Date)
-                .GetPagedAsync(page, 5);
+            model = model ?? new TastingEntriesIndexModel();
+            model.Data = await _tastingEntryService.List(page, 5, model.Search);
+            await FillLookups(null);
 
-            return View(data);
+            return View(model);
         }
 
         // GET: TastingEntries/Details/5
@@ -36,9 +38,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var tastingEntry = await _context.TastingEntries
-                .Include(x => x.Batch).Include(x => x.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var tastingEntry = await _tastingEntryService.Get(id.Value);
             if (tastingEntry == null)
             {
                 return NotFound();
@@ -48,7 +48,7 @@ namespace KooliProjekt.Controllers
         }
 
         // GET: TastingEntries/Create
-        public IActionResult Create(int? batchId)
+        public async Task<IActionResult> Create(int? batchId)
         {
             var tastingEntry = new TastingEntry { Date = DateTime.Today };
             if (batchId.HasValue)
@@ -56,7 +56,7 @@ namespace KooliProjekt.Controllers
                 tastingEntry.BatchId = batchId.Value;
             }
 
-            FillBatches(tastingEntry.BatchId);
+            await FillLookups(tastingEntry.BatchId);
             return View(tastingEntry);
         }
 
@@ -66,13 +66,14 @@ namespace KooliProjekt.Controllers
         public async Task<IActionResult> Create([Bind("Id,BatchId,Date,UserId,Rating,Comment")] TastingEntry tastingEntry)
         {
             tastingEntry.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             if (ModelState.IsValid)
             {
-                _context.Add(tastingEntry);
-                await _context.SaveChangesAsync();
+                await _tastingEntryService.Save(tastingEntry);
                 return RedirectToAction(nameof(Index));
             }
-            FillBatches(tastingEntry.BatchId);
+
+            await FillLookups(tastingEntry.BatchId);
             return View(tastingEntry);
         }
 
@@ -84,12 +85,13 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var tastingEntry = await _context.TastingEntries.FindAsync(id);
+            var tastingEntry = await _tastingEntryService.Get(id.Value);
             if (tastingEntry == null)
             {
                 return NotFound();
             }
-            FillBatches(tastingEntry.BatchId);
+
+            await FillLookups(tastingEntry.BatchId);
             return View(tastingEntry);
         }
 
@@ -105,11 +107,11 @@ namespace KooliProjekt.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Update(tastingEntry);
-                await _context.SaveChangesAsync();
+                await _tastingEntryService.Save(tastingEntry);
                 return RedirectToAction(nameof(Index));
             }
-            FillBatches(tastingEntry.BatchId);
+
+            await FillLookups(tastingEntry.BatchId);
             return View(tastingEntry);
         }
 
@@ -121,9 +123,7 @@ namespace KooliProjekt.Controllers
                 return NotFound();
             }
 
-            var tastingEntry = await _context.TastingEntries
-                .Include(x => x.Batch).Include(x => x.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var tastingEntry = await _tastingEntryService.Get(id.Value);
             if (tastingEntry == null)
             {
                 return NotFound();
@@ -137,19 +137,13 @@ namespace KooliProjekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tastingEntry = await _context.TastingEntries.FindAsync(id);
-            if (tastingEntry != null)
-            {
-                _context.TastingEntries.Remove(tastingEntry);
-                await _context.SaveChangesAsync();
-            }
-
+            await _tastingEntryService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private void FillBatches(int? selectedId)
+        private async Task FillLookups(int? selectedId)
         {
-            ViewData["BatchId"] = new SelectList(_context.Batches.OrderBy(x => x.Code), "Id", "Code", selectedId);
+            ViewData["BatchId"] = new SelectList(await _batchService.Lookup(), "Id", "Code", selectedId);
         }
     }
 }

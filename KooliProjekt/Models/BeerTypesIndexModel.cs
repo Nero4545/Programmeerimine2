@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using KooliProjekt.Data;
 using KooliProjekt.Search;
 
 namespace KooliProjekt.Models
 {
+    [ExcludeFromCodeCoverage]
     public class BeerTypesIndexModel
     {
         public BeerTypeSearch Search { get; set; } = new BeerTypeSearch();

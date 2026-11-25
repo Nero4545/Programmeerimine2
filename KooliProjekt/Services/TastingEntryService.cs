@@ -53,7 +53,7 @@ namespace KooliProjekt.Services
             {
                 _context.TastingEntries.Add(item);
             }
-            else
+            else if (_context.Entry(item).State == EntityState.Detached)
             {
                 _context.TastingEntries.Update(item);
             }

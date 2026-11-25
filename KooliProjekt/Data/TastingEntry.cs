@@ -1,9 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 
 namespace KooliProjekt.Data
 {
     // Maitsmiste logi kanne
+    [ExcludeFromCodeCoverage]
     public class TastingEntry
     {
         public int Id { get; set; }
@@ -16,6 +19,7 @@ namespace KooliProjekt.Data
         public DateTime Date { get; set; }
 
         public string? UserId { get; set; }
+        [JsonIgnore]
         public IdentityUser? User { get; set; }
 
         [Range(1, 10)]

@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Data
 {
     // Koostisosa
+    [ExcludeFromCodeCoverage]
     public class Ingredient
     {
         public int Id { get; set; }

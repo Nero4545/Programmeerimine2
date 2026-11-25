@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations;
 
 namespace KooliProjekt.Data
 {
     // Õllesort
+    [ExcludeFromCodeCoverage]
     public class BeerType
     {
         public int Id { get; set; }

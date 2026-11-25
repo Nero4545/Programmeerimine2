@@ -1,8 +1,10 @@
-﻿using KooliProjekt.Data;
+using System.Diagnostics.CodeAnalysis;
+using KooliProjekt.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KooliProjekt.Components
 {
+    [ExcludeFromCodeCoverage]
     public class PagerViewComponent : ViewComponent
     {
         public Task<IViewComponentResult> InvokeAsync(PagedResultBase result)

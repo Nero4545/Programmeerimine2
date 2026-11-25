@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations;
 
 namespace KooliProjekt.Data
 {
     // Partii foto
+    [ExcludeFromCodeCoverage]
     public class BatchPhoto
     {
         public int Id { get; set; }

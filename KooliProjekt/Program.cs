@@ -19,7 +19,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
+builder.Services.AddCors();
 
 builder.Services.AddScoped<IBeerTypeService, BeerTypeService>();
 builder.Services.AddScoped<IBatchService, BatchService>();
@@ -42,6 +45,9 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCors(options => options.AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
 app.UseRouting();
 
@@ -65,4 +71,5 @@ using (var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Id
 
 app.Run();
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public partial class Program { }

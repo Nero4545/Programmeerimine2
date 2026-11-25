@@ -61,7 +61,7 @@ namespace KooliProjekt.Services
             {
                 _context.Batches.Add(item);
             }
-            else
+            else if (_context.Entry(item).State == EntityState.Detached)
             {
                 _context.Batches.Update(item);
             }

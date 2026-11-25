@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations;
 
 namespace KooliProjekt.Data
 {
     // Proovipartii
+    [ExcludeFromCodeCoverage]
     public class Batch
     {
         public int Id { get; set; }

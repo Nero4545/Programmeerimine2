@@ -12,6 +12,6 @@ del $TestReportsCrappy
 
 Get-ChildItem -Path ./BuildReports/UnitTests -Directory -Recurse | Remove-Item -Force  
 
-reportgenerator "-reports:$TestReports" "-targetdir:.//BuildReports//Coverage" "-reporttype:Html" "-classfilters:-AspNetCoreGeneratedDocument.*"
+reportgenerator "-reports:$TestReports" "-targetdir:.//BuildReports//Coverage" "-reporttype:Html" "-classfilters:-AspNetCoreGeneratedDocument.*;-KooliProjekt.Migrations.*"
 
-start "BuildReports\Coverage\index.htm"
+start "BuildReports\Coverage\index.htm"

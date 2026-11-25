@@ -49,7 +49,7 @@ namespace KooliProjekt.Services
             {
                 _context.Ingredients.Add(item);
             }
-            else
+            else if (_context.Entry(item).State == EntityState.Detached)
             {
                 _context.Ingredients.Update(item);
             }

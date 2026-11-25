@@ -58,7 +58,7 @@ namespace KooliProjekt.Services
             {
                 _context.LogEntries.Add(item);
             }
-            else
+            else if (_context.Entry(item).State == EntityState.Detached)
             {
                 _context.LogEntries.Update(item);
             }

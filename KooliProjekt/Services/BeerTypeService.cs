@@ -40,7 +40,7 @@ namespace KooliProjekt.Services
             {
                 _context.BeerTypes.Add(item);
             }
-            else
+            else if (_context.Entry(item).State == EntityState.Detached)
             {
                 _context.BeerTypes.Update(item);
             }
